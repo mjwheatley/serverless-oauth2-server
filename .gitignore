@@ -3,6 +3,7 @@ node_modules
 jspm_packages
 
 # other
+.idea
 .DS_Store
 data
 data/**
