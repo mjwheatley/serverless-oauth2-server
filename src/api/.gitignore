@@ -16,3 +16,4 @@ data/**
 # Secrets
 src/config/config.*.json
 !src/config/config.example.json
+!src/config/config.local.json

@@ -1,26 +1,29 @@
-import * as aws from "aws-sdk";
+import * as AWS from "aws-sdk";
 import * as crypto from "crypto";
 
 export abstract class DynamoDbRepository<T> {
-    protected client: aws.DynamoDB.DocumentClient;
+    protected client: AWS.DynamoDB.DocumentClient;
 
     constructor(protected tableName: string) {
         let dynamoOptions = undefined;
         if (!!process.env.IS_OFFLINE) {
             dynamoOptions = {
-                endpoint: "http://localhost:4569",
-                region: "ap-southeast-2"
+                region: "localhost",
+                endpoint: "http://localhost:8000",
+                accessKeyId: "DEFAULT_ACCESS_KEY",  // needed if you don't have aws credentials at all in env
+                secretAccessKey: "DEFAULT_SECRET" // needed if you don't have aws credentials at all in env
             };
         }
-        this.client = new aws.DynamoDB.DocumentClient(dynamoOptions);
+        this.client = new AWS.DynamoDB.DocumentClient(dynamoOptions);
     }
 
     abstract toDomainObject(dataObject: any): T;
+
     abstract toDataObject(domainObject: T): any;
 
     save(model: T): Promise<void> {
         return new Promise((resolve, reject) => {
-            const params: aws.DynamoDB.DocumentClient.PutItemInput = {
+            const params: AWS.DynamoDB.DocumentClient.PutItemInput = {
                 TableName: this.tableName,
                 Item: this.toDataObject(model)
             };
@@ -32,7 +35,7 @@ export abstract class DynamoDbRepository<T> {
 
     get(id): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            const params: aws.DynamoDB.DocumentClient.GetItemInput = {
+            const params: AWS.DynamoDB.DocumentClient.GetItemInput = {
                 TableName: this.tableName,
                 Key: {
                     id: id
@@ -55,7 +58,7 @@ export abstract class DynamoDbRepository<T> {
 
     delete(id): Promise<void> {
         return new Promise((resolve, reject) => {
-            const params: aws.DynamoDB.DocumentClient.DeleteItemInput = {
+            const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
                 TableName: this.tableName,
                 Key: {
                     id: id

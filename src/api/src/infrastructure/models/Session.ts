@@ -78,6 +78,6 @@ export class Session implements ISession {
      * Gets the login url for this session
      */
     getLoginUrl(): string {
-        return `http://localhost:4200/login?session=${this.id}`;
+        return `${process.env.BASE_URL}login?session=${this.id}`;
     }
 }

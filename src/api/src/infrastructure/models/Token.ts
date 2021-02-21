@@ -68,7 +68,7 @@ export class UserToken implements IUserToken {
     }
 
     /**
-     * Returns if this autorization code is still valid
+     * Returns if this authorization code is still valid
      */
     isValid(): boolean {
         return this._expires > new Date();

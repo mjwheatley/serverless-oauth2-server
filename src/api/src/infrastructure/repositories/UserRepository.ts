@@ -3,7 +3,7 @@ import { IUserRepository } from '../../core/repositories/IUserRepository';
 import { ExternalIdentity, InternalIdentity, User } from '../models/User';
 import { DynamoDbRepository } from './DynamoDbRepository';
 
-interface IUserDataObject {
+export interface IUserDataObject {
     id: string;
     identities: IUserIdentityDataObject[];
 

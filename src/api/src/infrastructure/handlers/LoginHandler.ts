@@ -167,6 +167,12 @@ export class LoginHandler extends Handler {
 
             const sessionRepository = new SessionRepository();
             const session = await sessionRepository.get(sessionId);
+            if (!session) {
+                return this.Error(callback, {
+                    error: "session_invalid",
+                    error_description: "Invalid session ID"
+                });
+            }
 
             // Validate the session
             if (!session.isValid()) {
@@ -200,7 +206,7 @@ export class LoginHandler extends Handler {
                     throw new Error("Not implemented");
                 }
                 if (session.responseType === "code") {
-                    // Generate an authroization code
+                    // Generate an authorization code
                     const code = AuthorizationCode.create({
                         subject: username,
                         clientId: session.clientId,

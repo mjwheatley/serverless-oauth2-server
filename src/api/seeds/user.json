@@ -1,0 +1,15 @@
+{
+  "id": "username@localhost",
+  "identities": [
+    {
+      "sub": "username@localhost",
+      "type": "internal",
+      "passwordHash": "$2a$10$13R/nvNWItTHOL.YMOYXcO8aWykydHywqP6FOODbP5Cy6TjfugpQu"
+    }
+  ],
+  "emailAddress": "username@localhost",
+  "emailVerified": false,
+  "name": "user name",
+  "givenName": "user",
+  "familyName": "name"
+}

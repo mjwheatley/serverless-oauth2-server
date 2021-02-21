@@ -1,0 +1,8 @@
+{
+  "id": "CLIENT_ID",
+  "jwtSecret": "SECRET",
+  "grantType": "authorization_code",
+  "redirectUris": [
+    "http://localhost:8080"
+  ]
+}

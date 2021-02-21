@@ -1,0 +1,5 @@
+{
+    "DB_ENCRYPTION_KEY": "SECRET",
+    "BASE_URL": "http://localhost:3000/",
+    "UI_URL": ""
+}

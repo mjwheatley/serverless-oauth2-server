@@ -49,7 +49,7 @@ functions:
     events:
       - http:
           path: oauth/token
-          method: post
+          method: get
   authorize:
     handler: src/handler.authorize
     events:
@@ -216,7 +216,30 @@ custom:
   dynamo_sessionsTable: "${self:service}_sessions_${opt:stage}"
   dynamo_tokensTable: "${self:service}_tokens_${opt:stage}"
   dynamo_usersTable: "${self:service}_users_${opt:stage}"
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
+    # Uncomment only if you already have a DynamoDB running locally
+    # noStart: true
+    seed:
+      local:
+        sources:
+          - table: ${self:custom.dynamo_clientsTable}
+            sources: [./seeds/client.json]
+          - table: ${self:custom.dynamo_usersTable}
+            sources: [./seeds/user.json]
+
 
 plugins:
   - serverless-webpack
-  - serverless-offline
+  - serverless-dynamodb-local
+  - serverless-offline #serverless-offline needs to be last in the list
