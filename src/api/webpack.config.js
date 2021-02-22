@@ -1,29 +1,25 @@
-const path = require("path");
-const slsw = require("serverless-webpack");
+const path = require('path');
+const slsw = require('serverless-webpack');
 
 module.exports = {
+    mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
     entry: slsw.lib.entries,
-    mode: "development",
-    devtool: "source-map",
+    devtool: 'source-map',
     resolve: {
-        extensions: [".js", ".json", ".ts", ".tsx"]
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx']
     },
-    externals: ["aws-sdk"],
     output: {
-        libraryTarget: "commonjs",
-        path: path.join(__dirname, ".webpack"),
-        filename: "[name].js"
+        libraryTarget: 'commonjs',
+        path: path.join(__dirname, '.webpack'),
+        filename: '[name].js'
     },
-    target: "node",
+    target: 'node',
     module: {
         rules: [
+            // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
             {
-                test: /\.ts(x?)$/,
-                use: [
-                    {
-                        loader: "ts-loader"
-                    }
-                ]
+                test: /\.tsx?$/,
+                loader: 'ts-loader'
             }
         ]
     }

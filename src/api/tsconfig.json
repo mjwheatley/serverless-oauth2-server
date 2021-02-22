@@ -1,7 +1,18 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "lib": [
+            "es2017"
+        ],
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "node",
+        "noUnusedLocals": true,
+        "noUnusedParameters": false,
         "sourceMap": true,
-        "lib": ["es5", "es6", "dom", "es2015", "esnext.asynciterable"]
-    }
+        "target": "es2017",
+        "outDir": "lib"
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }

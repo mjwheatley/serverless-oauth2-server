@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from "moment";
 import * as uuid from "uuid/v4";
 
 import { ISession } from "../../core/models/ISession";

@@ -4,7 +4,7 @@ import {
     Callback,
     Context
 } from "aws-lambda";
-import * as moment from "moment";
+import moment from "moment";
 import * as validator from "validator";
 
 import { Handler } from "../../core/handler";

@@ -5,7 +5,7 @@ import {
     Context
 } from "aws-lambda";
 import * as querystring from "querystring";
-import * as url from "url-join";
+import url from "url-join";
 
 import { Handler } from "../../core/handler";
 import { IProviderRepository } from "../../core/repositories/IProviderRepository";

@@ -6,7 +6,7 @@ import {
 } from "aws-lambda";
 import * as jsonwebtoken from "jsonwebtoken";
 import * as request from "request-promise-native";
-import * as url from "url-join";
+import url from "url-join";
 
 import { Handler } from "../../core/handler";
 import { IAuthorizationCodeRepository } from "../../core/repositories/IAuthorizationCodeRepository";

@@ -1,5 +1,5 @@
 import * as crypto from "crypto";
-import * as moment from "moment";
+import moment from "moment";
 
 import { IAuthorizationCode } from "../../core/models/IAuthorizationCode";
 
