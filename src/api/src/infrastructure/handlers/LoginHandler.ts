@@ -1,33 +1,32 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Callback, Context } from 'aws-lambda';
-import * as mustache from 'mustache';
-import * as querystring from 'querystring';
+import { APIGatewayProxyEvent, Context } from "aws-lambda";
+import * as mustache from "mustache";
+import * as querystring from "querystring";
 
-import { Handler } from '../../core/handler';
-import { IUserRepository } from '../../core/repositories/IUserRepository';
-import { AuthorizationCode } from '../models/AuthorizationCode';
-import { AuthorizationCodeRepository } from '../repositories/AuthorizationCodeRepository';
-import { SessionRepository } from '../repositories/SessionRepository';
-import { UserRepository } from '../repositories/UserRepository';
+import { Handler } from "../../core/handler";
+import { IUserRepository } from "../../core/repositories/IUserRepository";
+import { AuthorizationCode } from "../models/AuthorizationCode";
+import { AuthorizationCodeRepository } from "../repositories/AuthorizationCodeRepository";
+import { SessionRepository } from "../repositories/SessionRepository";
+import { UserRepository } from "../repositories/UserRepository";
 
 export class LoginHandler extends Handler {
-    async get(
-        event: APIGatewayProxyEvent,
-        context: Context,
-        callback: Callback<APIGatewayProxyResult>
-    ) {
-        // Query parameters
-        const sessionId = event.queryStringParameters.session;
+  async get(
+    event: APIGatewayProxyEvent,
+    context: Context
+  ) {
+    // Query parameters
+    const sessionId = event.queryStringParameters.session;
 
-        // Load the template
-        // let template = fs.readFileSync(
-        //     path.resolve(
-        //         process.env.LAMBDA_TASK_ROOT || "",
-        //         "src/templates/login/template.html"
-        //     ),
-        //     "utf8"
-        // );
-        let html = mustache.render(
-            `<html lang="en">
+    // Load the template
+    // let template = fs.readFileSync(
+    //     path.resolve(
+    //         process.env.LAMBDA_TASK_ROOT || "",
+    //         "src/templates/login/template.html"
+    //     ),
+    //     "utf8"
+    // );
+    let html = mustache.render(
+      `<html lang="en">
 
         <head>
             <!-- Required meta tags -->
@@ -134,109 +133,106 @@ export class LoginHandler extends Handler {
         </body>
         
         </html>`,
-            {
-                sessionId: sessionId,
-                baseUrl: process.env.BASE_URL
-            }
-        );
+      {
+        sessionId: sessionId,
+        baseUrl: process.env.BASE_URL
+      }
+    );
 
-        // Callback
-        callback(null, {
-            statusCode: 200,
-            headers: {
-                "Content-Type": "text/html"
-            },
-            body: html
+    // Callback
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "text/html"
+      },
+      body: html
+    };
+  }
+
+  async post(
+    event: APIGatewayProxyEvent,
+    context: Context
+  ) {
+    try {
+      // Get the request variables
+      const formParts = querystring.parse(event.body);
+      const username = `${formParts.username}`;
+      const password = `${formParts.password}`;
+      const sessionId = event.queryStringParameters.session;
+
+      console.log(formParts);
+
+      const sessionRepository = new SessionRepository();
+      const session = await sessionRepository.get(sessionId);
+      if (!session) {
+        return this.Error({
+          error: "session_invalid",
+          error_description: "Invalid session ID"
         });
-        return;
-    }
+      }
 
-    async post(
-        event: APIGatewayProxyEvent,
-        context: Context,
-        callback: Callback<APIGatewayProxyResult>
-    ) {
-        try {
-            // Get the request variables
-            const formParts = querystring.parse(event.body);
-            const username = `${formParts.username}`;
-            const password = `${formParts.password}`;
-            const sessionId = event.queryStringParameters.session;
+      // Validate the session
+      if (!session.isValid()) {
+        return this.Error({
+          error: "session_expired",
+          error_description: "Session has expired"
+        });
+      }
 
-            console.log(formParts);
+      const userRepository: IUserRepository = new UserRepository();
+      const user = await userRepository.get(username);
 
-            const sessionRepository = new SessionRepository();
-            const session = await sessionRepository.get(sessionId);
-            if (!session) {
-                return this.Error(callback, {
-                    error: "session_invalid",
-                    error_description: "Invalid session ID"
-                });
-            }
+      if (!user) {
+        return this.Error({
+          error: "credentials_invalid",
+          error_description: "Invalid username"
+        });
+      }
 
-            // Validate the session
-            if (!session.isValid()) {
-                return this.Error(callback, {
-                    error: "session_expired",
-                    error_description: "Session has expired"
-                });
-            }
+      if (!user.hasInternalIdentity()) {
+        return this.Error({
+          error: "credentials_invalid",
+          error_description: "Username is not registered locally"
+        });
+      }
 
-            const userRepository: IUserRepository = new UserRepository();
-            const user = await userRepository.get(username);
-
-            if (!user) {
-                return this.Error(callback, {
-                    error: "credentials_invalid",
-                    error_description: "Invalid username"
-                });
-            }
-
-            if (!user.hasInternalIdentity()) {
-                return this.Error(callback, {
-                    error: "credentials_invalid",
-                    error_description: "Username is not registered locally"
-                });
-            }
-
-            let internalIdentity = user.getInternalIdentity();
-            if (internalIdentity.login(password)) {
-                // Login successful
-                if (session.responseType === "token") {
-                    throw new Error("Not implemented");
-                }
-                if (session.responseType === "code") {
-                    // Generate an authorization code
-                    const code = AuthorizationCode.create({
-                        subject: username,
-                        clientId: session.clientId,
-                        redirectUrl: session.redirectUri
-                    });
-
-                    // Save the auth code
-                    const authorizationCodeRepository = new AuthorizationCodeRepository();
-                    authorizationCodeRepository.save(code);
-
-                    // Send them back to the auth server with a authorization code
-                    return this.Redirect(
-                        callback,
-                        `${session.redirectUri}?code=${code.id}&state=${
-                            session.state
-                        }`
-                    );
-                }
-            } else {
-                // Login failed
-                return this.Unauthorized(callback, {
-                    error: "credentials_invalid",
-                    error_description: "Invalid username password"
-                });
-            }
-        } catch (err) {
-            return this.Error(callback, {
-                error: "server_error",
-                error_description: err.message || err
-            });
+      let internalIdentity = user.getInternalIdentity();
+      if (internalIdentity.login(password)) {
+        // Login successful
+        if (session.responseType === "token") {
+          throw new Error("Not implemented");
         }
+        if (session.responseType === "code") {
+          // Generate an authorization code
+          const code = AuthorizationCode.create({
+            subject: username,
+            clientId: session.clientId,
+            redirectUrl: session.redirectUri
+          });
+
+          // Save the auth code
+          const authorizationCodeRepository = new AuthorizationCodeRepository();
+          await authorizationCodeRepository.save(code);
+
+          // Send them back to the auth server with a authorization code
+          return this.Redirect(
+            `${session.redirectUri}?code=${code.id}&state=${
+              session.state
+            }`
+          );
+        }
+      } else {
+        // Login failed
+        return this.Unauthorized({
+          error: "credentials_invalid",
+          error_description: "Invalid username password"
+        });
+      }
+    } catch (err) {
+      return this.Error({
+        error: "server_error",
+        error_description: err.message || err
+      });
     }
+  }
 }

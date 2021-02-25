@@ -26,17 +26,17 @@ The project provides the following endpoints:
 Use `npm start` to spin up a local instance of serverless running the identity provider.
 
 
-[Test /oauth/authorize](http://localhost:3000/oauth/authorize?client_id=CLIENT_ID&client_secret=SECRET&redirect_uri=http://localhost:8080&response_type=code&state=youknowwhere)
+[Test /oauth/authorize](http://localhost:3000/oauth/authorize?client_id=CLIENT_ID&redirect_uri=http://localhost:3001/auth/idp/callback&response_type=code&state=youknowwhere)
 ```
-http://localhost:3000/oauth/authorize?client_id=CLIENT_ID&client_secret=SECRET&redirect_uri=http://localhost:8080&response_type=code&state=youknowwhere
+http://localhost:3000/oauth/authorize?client_id=CLIENT_ID&redirect_uri=http://localhost:3001/auth/idp/callback&response_type=code&state=youknowwhere
 ```
 
 * emailAddress: `username@localhost`
 * password: `password1!`
 
-[Test /oauth/token](http://localhost:3000/oauth/token?client_id=CLIENT_ID&client_secret=SECRET&redirect_uri=http://localhost:8080&grant_type=authorization_code&code=8e8bb450b299b9690b13986bcd645783)
+[Test /oauth/token](http://localhost:3000/oauth/token?client_id=CLIENT_ID&redirect_uri=http://localhost:3001/auth/idp/callback&grant_type=authorization_code&code=8e8bb450b299b9690b13986bcd645783)
 ```
-http://localhost:3000/oauth/token?client_id=CLIENT_ID&client_secret=SECRET&redirect_uri=http://localhost:8080&grant_type=authorization_code&code=dac486371ae7c7ff43beb61106e3ad3e
+http://localhost:3000/oauth/token?client_id=CLIENT_ID&client_secret=SECRET&redirect_uri=http://localhost:3001/auth/idp/callback&grant_type=authorization_code&code=dac486371ae7c7ff43beb61106e3ad3e
 ```
 
 ## Deploying to AWS

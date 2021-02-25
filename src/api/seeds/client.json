@@ -1,8 +1,9 @@
 {
   "id": "CLIENT_ID",
+  "secret": "CLIENT_SECRET",
   "jwtSecret": "SECRET",
   "grantType": "authorization_code",
   "redirectUris": [
-    "http://localhost:8080"
+    "http://localhost:3001/auth/idp/callback"
   ]
 }

@@ -1,25 +1,23 @@
-import { APIGatewayProxyResult, Callback } from 'aws-lambda';
+import { APIGatewayProxyResult } from 'aws-lambda';
 
 export abstract class Handler {
     Ok(
-        callback: Callback<APIGatewayProxyResult>,
         body?: any,
         headers?: { [header: string]: string | number | boolean }
-    ): void {
+    ): APIGatewayProxyResult {
         const response = {
             statusCode: 200,
             headers: headers ? headers : null,
             body: body ? JSON.stringify(body) : null
         };
         console.log(response);
-        callback(null, response);
+        return response;
     }
 
     Redirect(
-        callback: Callback<APIGatewayProxyResult>,
         location: string,
         headers?: { [header: string]: string | number | boolean }
-    ): void {
+    ): APIGatewayProxyResult {
         if (!headers) {
             headers = {};
         }
@@ -30,11 +28,10 @@ export abstract class Handler {
             body: null
         };
         console.log(JSON.stringify(response));
-        callback(null, response);
+        return response;
     }
 
     Error(
-        callback: Callback<APIGatewayProxyResult>,
         body?: any,
         headers?: { [header: string]: string | number | boolean }
     ) {
@@ -44,11 +41,10 @@ export abstract class Handler {
             body: body ? JSON.stringify(body) : null
         };
         console.log(JSON.stringify(response));
-        callback(null, response);
+        return response;
     }
 
     Unauthorized(
-        callback: Callback<APIGatewayProxyResult>,
         body?: any,
         headers?: { [header: string]: string | number | boolean }
     ) {
@@ -58,11 +54,10 @@ export abstract class Handler {
             body: body ? JSON.stringify(body) : null
         };
         console.log(response);
-        callback(null, response);
+        return response;
     }
 
     BadRequest(
-        callback: Callback<APIGatewayProxyResult>,
         body?: any,
         headers?: { [header: string]: string | number | boolean }
     ) {
@@ -72,6 +67,6 @@ export abstract class Handler {
             body: body ? JSON.stringify(body) : null
         };
         console.log(response);
-        callback(null, response);
+        return response;
     }
 }
